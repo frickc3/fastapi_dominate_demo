@@ -1,0 +1,10 @@
+# Default to LF in repository
+* text=auto
+
+# Force LF for scripts (even on Windows)
+*.sh text eol=lf
+*.py text eol=lf
+
+# Force CRLF for Windows-specific files
+*.bat text eol=crlf
+*.sln text eol=crlf
