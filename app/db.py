@@ -18,8 +18,10 @@ from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from dataclasses import dataclass
 from datetime import datetime
-from hashlib import scrypt
+from email_validator import validate_email, EmailNotValidError
+#from hashlib import scrypt
 from icecream import ic
+from password_validation import PasswordPolicy
 from pathlib import Path
 
 import sqlcipher3.dbapi2 as sqlcipher_driver
@@ -40,6 +42,14 @@ ph = PasswordHasher(
     time_cost=2,
     memory_cost=19456,      # 19 MiB
     parallelism=1
+)
+
+pwd_policy = PasswordPolicy(
+    uppercase=1,
+    symbols=1,
+    numbers=1,
+    min_length=12,
+    max_length=60,
 )
 
 
@@ -213,22 +223,32 @@ def verify_password(password: str, stored: str) -> bool:
     except VerifyMismatchError:
         return False
 
+def validate_email_address(email: str) -> bool:
+    try:
+        email_info = validate_email(email, check_deliverability=False)
+        return True
+    except EmailNotValidError:
+        return False
+
 # --------------------------------------------------------- validation ------
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
 USERNAME_RE = re.compile(r"^[A-Za-z0-9_.-]{3,24}$")
 
 
-def validate_registration(email: str, username: str,
-                          password: str, password_again: str) -> str | None:
-    if not EMAIL_RE.match(email or ""):
+
+def validate_registration(email: str,password: str, password_again: str) -> str | None:
+    #if not EMAIL_RE.match(email or ""):
+    if not validate_email_address(email):
         return "Enter a valid email address."
     #if not USERNAME_RE.match(username or ""):
     #    return "Username must be 3–24 characters (letters, digits, . _ -)."
-    if len(password) < 10:
+    if len(password) < 12:
         return "Password must be at least 10 characters."
-    if len(password) > 1024:
-        return "Password is too long."
+    #if len(password) > 60:
+    #    return "Password is too long."
+    if not pwd_policy.validate(password):
+        return "Password is not valid."
     if password != password_again:
         return "Passwords do not match."
     return None

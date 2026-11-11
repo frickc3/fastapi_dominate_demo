@@ -12,6 +12,8 @@ dependencies = [
     "fastlite>=0.2.4",
     "icecream>=2.2.0",
     "itsdangerous>=2.2.0",
+    "password-validation>=0.1.1",
+    "password-validator>=1.0",
     "ruff>=0.17.4",
     "sqlcipher3>=0.6.5",
 ]

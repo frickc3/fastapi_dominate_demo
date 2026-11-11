@@ -8,9 +8,13 @@ embeds a hidden CSRF field from ``csrf_field()``.
 
 from dominate import document
 from dominate import tags as t
+from dominate.util import raw
+from icecream import ic
 
 UNO_RUNTIME = "https://cdn.jsdelivr.net/npm/@unocss/runtime/uno.global.js"
 UNO_RESET = "https://cdn.jsdelivr.net/npm/@unocss/reset/normalize.min.css"
+TOGGLEPWDJS = "/static/js/togglePassword.js"
+REG_TOGGLEPWDJS = "/static/js/reg_togglePassword.js"
 
 
 def csrf_field(token: str):
@@ -86,6 +90,10 @@ def page(title: str, content, flashes=None, user=None, active: str = "",
                     t.span("FastAPI · dominate · UnoCSS · fastlite")
                     t.span("SQLCipher AE-256 at rest · Argon2 · CSRF")
         t.script(src=UNO_RUNTIME)
+        if title.startswith("Login"):
+            t.script(src=TOGGLEPWDJS)
+        if title.startswith("Register"):
+            t.script(src=REG_TOGGLEPWDJS)
     return doc.render(pretty=False)
 
 
@@ -127,22 +135,72 @@ def register_form(csrf_token, error=None, values=None) -> str:
                                      "bg-red-50 text-red-800 border-red-300")
                 with t.form(action="/register", method="post", id="register-form"):
                     csrf_field(csrf_token)
+                    with t.div(cls="mb-6"):
+                        t.label("Email", cls="block text-sm font-medium mb-1",
+                                **{"for": "email"})
+                        t.input_(type="email", id="email", name="email",
+                                 autocomplete="email",
+                                 cls="w-full px-3 py-2 rounded-lg border border-gray-300 "
+                                     "focus:outline-none focus:ring-2 focus:ring-emerald-500",
+                                 required=None)
+
+                    """
                     for label, name, itype in (
-                        ("Email", "email", "email"),
+                        #("Email", "email", "email"),
                         #("Username (3–24 letters, digits, . _ -)", "username", "text"),
-                        ("Password (min 10 chars)", "password", "password"),
+                        ("Password (min 12 chars)", "password", "password"),
                         ("Repeat password", "password_again", "password"),
                     ):
                         with t.div(cls="mb-4"):
                             t.label(label, cls="block text-sm font-medium mb-1",
                                     **{"for": f"reg_{name}"})
-                            t.input_(type="text" if name == "username" else itype,
-                                     id=f"reg_{name}", name=name,
-                                     value=values.get(name, ""),
-                                     minlength="10" if name.startswith("password") else None,
+                            with t.div(cls="relative w-full max-w-xs inline-block"):
+                                t.input_(type=itype,
+                                         id=f"reg_{name}", name=name,
+                                         value=values.get(name, ""),
+                                         minlength="12" if name.startswith("password") else None,
+                                         autocomplete="new-password",
+                                         cls="w-full px-3 py-2 rounded-lg border border-gray-300 "
+                                             "focus:outline-none focus:ring-2 focus:ring-emerald-500",
+                                         required=None)
+                                with t.span(cls='absolute left-100% top-1/2 -translate-y-1/2 h-5 w-5'):
+                                    t.img(id="togglePassword", src="/static/img/eye-regular-full.svg", width="15px",
+                                          height="15px",
+                                          style="cursor: pointer;")
+                    """
+                    with t.div(cls="mb-4"):
+                        t.label("Password (min 12 chars)", cls="block text-sm font-medium mb-1",
+                                **{"for": "reg_password"})
+                        with t.div(cls="relative w-full max-w-xs inline-block"):
+                            t.input_(type="password",
+                                     id="reg_password", name="password",
+                                     #value=values.get(password, ""),
+                                     minlength="12",
+                                     autocomplete="new-password",
                                      cls="w-full px-3 py-2 rounded-lg border border-gray-300 "
                                          "focus:outline-none focus:ring-2 focus:ring-emerald-500",
                                      required=None)
+                            with t.span(cls='absolute left-100% top-1/2 -translate-y-1/2 h-5 w-5'):
+                                t.img(id="reg_togglePassword", src="/static/img/eye-regular-full.svg", width="15px",
+                                      height="15px",
+                                      style="cursor: pointer;")
+                    with t.div(cls="mb-4"):
+                        t.label("Repeat Password", cls="block text-sm font-medium mb-1",
+                                **{"for": "reg_password_again"})
+                        with t.div(cls="relative w-full max-w-xs inline-block"):
+                            t.input_(type="password",
+                                     id="reg_password_again", name="password_again",
+                                     #value=values.get(password, ""),
+                                     minlength="12",
+                                     autocomplete="new-password",
+                                     cls="w-full px-3 py-2 rounded-lg border border-gray-300 "
+                                         "focus:outline-none focus:ring-2 focus:ring-emerald-500",
+                                     required=None)
+                            with t.span(cls='absolute left-100% top-1/2 -translate-y-1/2 h-5 w-5'):
+                                t.img(id="reg_togglePassword_again", src="/static/img/eye-regular-full.svg", width="15px",
+                                      height="15px",
+                                      style="cursor: pointer;")
+
                     t.button("Register",
                              cls="w-full px-4 py-2.5 rounded-xl bg-emerald-600 text-white "
                                  "font-semibold hover:bg-emerald-500 cursor-pointer",
@@ -154,7 +212,7 @@ def register_form(csrf_token, error=None, values=None) -> str:
 
 
 def login_form(csrf_token, error=None, next_url: str = "") -> str:
-    with t.div(cls="py-10 flex justify-center") as out:
+    with t.div(cls="py-12 flex justify-center") as out:
         with t.div(cls="w-full max-w-sm"):
             with t.div(cls="bg-white rounded-2xl shadow-md p-8"):
                 t.h5("Log in", cls="text-2xl font-bold text-center mb-6")
@@ -165,22 +223,27 @@ def login_form(csrf_token, error=None, next_url: str = "") -> str:
                     csrf_field(csrf_token)
                     if next_url:
                         t.input_(type="hidden", name="next", value=next_url)
-                    with t.div(cls="mb-4"):
+                    with t.div(cls="mb-6"):
                         t.label("Email", cls="block text-sm font-medium mb-1",
                                 **{"for": "login_email"})
                         t.input_(type="email", id="login_email", name="email",
                                  cls="w-full px-3 py-2 rounded-lg border border-gray-300 "
                                      "focus:outline-none focus:ring-2 focus:ring-emerald-500",
                                  required=None)
-                    with t.div(cls="mb-4"):
+                    with t.div(cls="mb-6"):
                         t.label("Password", cls="block text-sm font-medium mb-1",
                                 **{"for": "login_password"})
-                        t.input_(type="password", id="login_password", name="password",
-                                 cls="w-full px-3 py-2 rounded-lg border border-gray-300 "
-                                     "focus:outline-none focus:ring-2 focus:ring-emerald-500",
-                                 required=None)
+                        with t.div(cls="relative w-full max-w-xs inline-block"):
+                            t.input_(type="password", id="login_password", name="password",
+                                     cls="w-full px-3 py-2.5 rounded-lg border border-gray-300 "
+                                         "focus:outline-none focus:ring-2 focus:ring-emerald-500",
+                                     required=None)
+                            with t.span(cls='absolute left-100% top-1/2 -translate-y-1/2 h-5 w-5'):
+                                t.img(id="togglePassword", src="/static/img/eye-regular-full.svg", width="15px", height="15px",
+                                      style="cursor: pointer;")
+
                     t.button("Log in",
-                             cls="w-full px-4 py-2.5 rounded-xl bg-emerald-600 text-white "
+                             cls="w-full px-4 py-3 rounded-xl bg-emerald-600 text-white "
                                  "font-semibold hover:bg-emerald-500 cursor-pointer",
                              type_="submit")
                 t.p("No account? ", t.a("Register", href="/register",

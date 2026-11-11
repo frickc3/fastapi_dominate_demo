@@ -611,6 +611,8 @@ dependencies = [
     { name = "fastlite" },
     { name = "icecream" },
     { name = "itsdangerous" },
+    { name = "password-validation" },
+    { name = "password-validator" },
     { name = "ruff" },
     { name = "sqlcipher3" },
 ]
@@ -626,6 +628,8 @@ requires-dist = [
     { name = "fastlite", specifier = ">=0.2.4" },
     { name = "icecream", specifier = ">=2.2.0" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
+    { name = "password-validation", specifier = ">=0.1.1" },
+    { name = "password-validator", specifier = ">=1.0" },
     { name = "ruff", specifier = ">=0.17.4" },
     { name = "sqlcipher3", specifier = ">=0.6.5" },
 ]
@@ -1160,6 +1164,23 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/37/3f/50f95972b50e8e353f5b9342034c9cd17730f1956f009ce6a3fbbd89f9ce/opentelemetry_semantic_conventions-0.66b2.tar.gz", hash = "sha256:7da5f1a5dc4383eb66711d4d3d3e71824d9403ac1559fea021cc103c1a4c4976", size = 150246, upload-time = "2026-10-29T17:29:55.682Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/67/bd/6bf33ed31521c565931c037e9e81bac47c1acb000e850c6e24220e2a0c00/opentelemetry_semantic_conventions-0.66b2-py3-none-any.whl", hash = "sha256:4cbe61e5f9275d57ab31708446e7938ef4291ebbe6a7fca6f7a629c5acae87d8", size = 206280, upload-time = "2026-10-29T17:29:35.062Z" },
+]
+
+[[package]]
+name = "password-validation"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4d/32/df062a16f90f0af5742979e656083004170d4911fea96ccef9a2d9bddc83/Password_Validation-0.1.1-py3-none-any.whl", hash = "sha256:b03904ff2a58e66b7902b60a21161b0b328fef3d75b330f50f58fa979ac2b234", size = 11973, upload-time = "2020-08-10T22:11:52.334Z" },
+]
+
+[[package]]
+name = "password-validator"
+version = "1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/1f/60/3529640092041a8d46e9c88cdcd6d00f212b3e38e398d4c167eec549fc46/password_validator-1.0.tar.gz", hash = "sha256:f12c1036b17c67fab607ad8003f43e73940793d7ab89bc7efcb2cd47c024533b", size = 4247, upload-time = "2020-05-31T16:53:48.288Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b8/14/b65256d9f801d172a815adf003892b034fe6dbadec7b9def4f45309a7a56/password_validator-1.0-py3-none-any.whl", hash = "sha256:4de1758e15b4e9bdf32933fcc99ce89efcdd28566e26e130726bb4295dd0d44c", size = 5723, upload-time = "2020-05-31T16:53:44.439Z" },
 ]
 
 [[package]]

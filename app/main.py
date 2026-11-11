@@ -24,6 +24,7 @@ from pathlib import Path
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi_security_headers import SecurityHeadersMiddleware, Presets
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import FormData
 
@@ -36,7 +37,6 @@ DATA_DIR = BASE_DIR / "data"
 #SESSION_KEY_FILE = DATA_DIR / "session_key.txt"
 #PORT = 8000
 MAX_BODY = 64 * 1024
-
 
 """
 def _load_or_create_secret() -> str:
@@ -60,6 +60,7 @@ app = FastAPI(title="FastSite", docs_url=None, redoc_url=None,
               openapi_url=None)  # no docs/JSON endpoints in a secure app
 """
 app = FastAPI(title="FastSite")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     SecurityHeadersMiddleware,
